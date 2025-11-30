@@ -8,6 +8,7 @@ import { RoleSelection } from './components/RoleSelection';
 import { AdvertiserDashboard } from './components/AdvertiserDashboard';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { NavSection, Post, AdSlot, ChannelProfile, Language, UserRole } from './types';
+import { addSlotToChannel } from './services/mockBackend';
 
 declare global {
   interface Window {
@@ -33,11 +34,7 @@ const App: React.FC = () => {
     { id: '1', content: 'Welcome to our new channel!', scheduledDate: new Date(), status: 'posted', topic: 'Intro', type: 'content' },
   ]);
 
-  const [adSlots, setAdSlots] = useState<AdSlot[]>([
-    { id: '1', date: new Date(new Date().setDate(new Date().getDate() + 1)), price: 500, currency: 'STARS', estimatedViews: 1200, status: 'available' },
-    { id: '2', date: new Date(new Date().setDate(new Date().getDate() + 3)), price: 750, currency: 'STARS', estimatedViews: 1500, status: 'available' },
-    { id: '3', date: new Date(new Date().setDate(new Date().getDate() + 4)), price: 450, currency: 'STARS', estimatedViews: 1100, status: 'sold', buyerName: 'CryptoKing' },
-  ]);
+  const [adSlots, setAdSlots] = useState<AdSlot[]>([]);
 
   useEffect(() => {
     if (window.Telegram?.WebApp) {
@@ -62,7 +59,19 @@ const App: React.FC = () => {
         category: 'Tech',
         slots: [] 
     });
+    // In a real app, we would fetch existing slots here
+    setAdSlots([]); 
     setIsAuthenticated(true);
+  };
+
+  const handleCreateSlot = async (slot: AdSlot) => {
+    if (!channelProfile) return;
+    
+    // 1. Update local state for Owner
+    setAdSlots([...adSlots, slot]);
+    
+    // 2. Update Mock Backend for Advertisers
+    await addSlotToChannel(channelProfile.username, slot);
   };
 
   // --- Render Logic ---
@@ -104,7 +113,7 @@ const App: React.FC = () => {
       case NavSection.STATS:
         return <StatsView lang={lang} />;
       case NavSection.MARKETPLACE:
-        return <AdMarketplace slots={adSlots} onBuy={() => {}} lang={lang} />; // Owner views slots
+        return <AdMarketplace slots={adSlots} onBuy={() => {}} onCreateSlot={handleCreateSlot} lang={lang} />;
       default:
         return <CalendarView posts={posts} setPosts={setPosts} lang={lang} />;
     }

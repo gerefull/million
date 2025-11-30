@@ -7,6 +7,8 @@ const translations = {
     loading: "Loading...",
     back: "Back",
     close: "Close",
+    cancel: "Cancel",
+    save: "Save",
     
     // Role Selection
     selectRole: "Select Your Role",
@@ -77,6 +79,10 @@ const translations = {
     buySlots: "Manage your slots",
     soldTo: "Sold to",
     available: "Available",
+    createSlot: "Create Ad Slot",
+    slotDate: "Slot Date",
+    slotPrice: "Price (Stars)",
+    create: "Create",
     
     // Advertiser Dashboard
     findChannels: "Find Channels",
@@ -98,6 +104,8 @@ const translations = {
     loading: "Загрузка...",
     back: "Назад",
     close: "Закрыть",
+    cancel: "Отмена",
+    save: "Сохранить",
 
     // Role Selection
     selectRole: "Выберите роль",
@@ -168,6 +176,10 @@ const translations = {
     buySlots: "Управление слотами",
     soldTo: "Купил",
     available: "Доступно",
+    createSlot: "Создать слот",
+    slotDate: "Дата слота",
+    slotPrice: "Цена (Stars)",
+    create: "Создать",
 
     // Advertiser Dashboard
     findChannels: "Найти каналы",

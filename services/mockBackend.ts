@@ -78,7 +78,10 @@ export const registerNewChannel = async (profile: ChannelProfile): Promise<void>
   const exists = MOCK_CHANNELS.find(c => c.username === profile.username);
   if (!exists) {
     // Add default slots for the new user so they have something to sell
-    const newProfile = { ...profile, slots: generateSlots() };
+    const newProfile = { ...profile };
+    // We don't generate slots automatically here anymore, the user should create them manually
+    // but for demo purposes, we can leave it empty or add some. 
+    // Let's leave slots empty so the user can use the "Create Slot" feature.
     MOCK_CHANNELS.unshift(newProfile); // Add to top
   }
 };
@@ -110,18 +113,20 @@ export const verifyChannelExists = async (username: string): Promise<ChannelProf
 
   const cleanUsername = username.replace('@', '').replace('https://t.me/', '');
   
-  // 1. Check mock DB first
+  // 1. Check mock DB first (simulating internal cache)
   const existing = MOCK_CHANNELS.find(c => c.username.toLowerCase() === cleanUsername.toLowerCase());
   if (existing) return existing;
 
   // 2. "Real" Telegram simulation
-  // In a real app, this would POST to backend -> Telegram API getChat
-  if (cleanUsername.length >= 3 && /^[a-zA-Z0-9_]+$/.test(cleanUsername)) {
+  // Strict rules to simulate a real check: 
+  // - Must be at least 4 chars
+  // - Must not be "invalid" or "test"
+  if (cleanUsername.length >= 4 && /^[a-zA-Z0-9_]+$/.test(cleanUsername) && cleanUsername !== 'invalid') {
     return {
       username: cleanUsername,
       title: `${cleanUsername} Channel`,
       isVerified: false,
-      subscribers: 0, // New channel
+      subscribers: 0, // New channel starts at 0
       category: 'Tech', // Default
       slots: []
     };
@@ -144,4 +149,16 @@ export const purchaseSlot = async (channelUsername: string, slotId: string): Pro
   }
   
   return true; 
+};
+
+export const addSlotToChannel = async (username: string, slot: AdSlot): Promise<void> => {
+  await new Promise(resolve => setTimeout(resolve, 500)); // Network delay
+
+  const channel = MOCK_CHANNELS.find(c => c.username === username);
+  if (channel) {
+    // Add slot to the 'global' backend store so advertisers see it
+    channel.slots.push(slot);
+    // Sort slots by date
+    channel.slots.sort((a, b) => a.date.getTime() - b.date.getTime());
+  }
 };
